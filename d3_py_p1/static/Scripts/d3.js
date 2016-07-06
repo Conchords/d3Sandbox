@@ -87,7 +87,6 @@ function loadWEB(url,callback) {
 };
 
 function str2Date(intDate) {
-	// console.log("intdate: " + intDate);
 	var strDate = new String(intDate);
 	var year = strDate.substr(0,4);
 	var month = strDate.substr(4,2)-1;
