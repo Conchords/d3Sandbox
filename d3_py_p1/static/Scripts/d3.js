@@ -15,7 +15,6 @@ var salesAvg = 0.0;
 var metrics=[];
 
 // globals transitions
-// var trans_viz;
 var trans_ds = 0;
 var trans_duration = 1000;
 
