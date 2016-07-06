@@ -215,8 +215,6 @@ function plotLine(div, ds) {
 
 function plotArea(div, ds) {
 
-	// var t = d3.select(".d3-div").append("table");
-
 	var minDate = str2Date(ds.monthlySales[0].month);
 	var maxDate = str2Date(ds.monthlySales[ds.monthlySales.length - 1].month);
 
