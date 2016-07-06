@@ -140,8 +140,6 @@ function showHeader(div, ds) {
 }
 
 function plotLine(div, ds) {
-
-	// var t = d3.select(".d3-div").append("table");
 	
 	// console.log(ds);
 
