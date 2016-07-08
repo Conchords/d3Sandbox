@@ -16,7 +16,8 @@ var metrics=[];
 
 // globals transitions
 var trans_ds = 0;
-var trans_duration = 1000;
+var curr_ds = 0;
+var trans_duration = 500;
 
 /*
 var metrics = {
@@ -255,20 +256,34 @@ function plotArea(div, ds) {
 		.y0(h - padding - margin)
 		.y1(function (d) { return yScale(d.sales); });
 
-	// var viz = svg.append("path")
-	trans_viz = svg.append("path")
+	var areaFunFlat = d3.area()
+		.x(function(d) { return xScale(str2Date(d.month)); })
+		.y0(h - padding - margin)
+		.y1(h - padding - margin);
+
+	var viz = svg.append("path")
+		.attrs({
+			d: areaFunFlat(ds.monthlySales),
+			"stroke":"purple",
+			"fill":"purple",
+			"class":"area"
+		});
+
+	viz.transition()
 		.attrs({
 			d: areaFun(ds.monthlySales),
 			"stroke":"purple",
 			"fill":"purple",
 			"class":"area"
-		});
+		})
+		.duration(trans_duration);
 }
 
 
 function nextDS() {
 
 	console.log("current ds:" + trans_ds);
+	curr_ds = trans_ds;
 	trans_ds = (++trans_ds) % ds.length;
 	console.log("next ds:" + trans_ds);
 	nextPlot();
@@ -278,6 +293,8 @@ function nextDS() {
 function nextPlot() {
 
 	nextds = ds[trans_ds];
+	currds = ds[curr_ds];
+
 	var minDate = str2Date(nextds.monthlySales[0].month);
 	var maxDate = str2Date(nextds.monthlySales[nextds.monthlySales.length - 1].month);
 
@@ -299,8 +316,30 @@ function nextPlot() {
 		.y0(h - padding - margin)
 		.y1(function (d) { return yScale(d.sales); });
 
+	var areaFunFlat = d3.area()
+		.x(function(d) { return xScale(str2Date(d.month)); })
+		.y0(h - padding - margin)
+		.y1(h - padding - margin);
+
 
 	var xAxis = d3.axisBottom(xScale).ticks(nextds.monthlySales.length).tickFormat(d3.timeFormat("%b"));
+	
+
+	var currminDate = str2Date(currds.monthlySales[0].month);
+	var currmaxDate = str2Date(currds.monthlySales[currds.monthlySales.length - 1].month);
+
+	var currxScale = d3.scaleTime()
+					.domain([currminDate,currmaxDate])
+					.range([padding + margin,w - padding])
+					.nice();
+
+	var currareaFunFlat = d3.area()
+		.x(function(d) { return currxScale(str2Date(d.month)); })
+		.y0(h - padding - margin)
+		.y1(h - padding - margin);
+
+
+
 	// var yAxis = d3.axisLeft(yScale).ticks(7);
 
 		
@@ -321,16 +360,37 @@ function nextPlot() {
 		.call(xAxis)
 		.duration(trans_duration);
 
-
-
-	d3.select(".center-viz").select(".area").transition()
+	var t0 = d3.select(".center-viz").select(".area").transition()
 		.attrs({
-			d: areaFun(nextds.monthlySales),
+			d: currareaFunFlat(currds.monthlySales),
 			"stroke":"purple",
 			"fill":"purple",
 			"class":"area"
 		})
 		.duration(trans_duration);
+
+	// d3.select(".center-viz").select(".area").transition()
+	var t1 = t0.transition();
+		t1.attrs({
+			d: areaFunFlat(nextds.monthlySales),
+			"stroke":"purple",
+			"fill":"purple",
+			"class":"area"
+		})
+		// .delay(trans_duration)
+		.duration(0)
+		;
+
+	// d3.select(".center-viz").select(".area").transition()
+	var t2 = t1.transition();
+		t2.attrs({
+			d: areaFun(nextds.monthlySales),
+			"stroke":"purple",
+			"fill":"purple",
+			"class":"area"
+		})
+		.duration(trans_duration)
+		.delay(20);
 }
 
 function nextHeader() {
